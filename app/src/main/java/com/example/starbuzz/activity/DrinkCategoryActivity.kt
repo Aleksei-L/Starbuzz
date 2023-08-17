@@ -1,4 +1,4 @@
-package com.example.starbuzz
+package com.example.starbuzz.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,8 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.starbuzz.Drink
+import com.example.starbuzz.R
 
 class DrinkCategoryActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
