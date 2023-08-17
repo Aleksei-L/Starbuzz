@@ -20,13 +20,13 @@ class DrinkActivity : AppCompatActivity() {
 		try {
 			val db = starbuzzDatabaseHelper.readableDatabase
 			val cursor = db.query(
-					"drink",
-					arrayOf("name", "description", "image_resource_id"),
-					"_id = ?",
-					arrayOf((drinkId + 1).toString()),
-					null,
-					null,
-					null
+				"drink",
+				arrayOf("name", "description", "image_resource_id"),
+				"_id = ?",
+				arrayOf(drinkId.toString()),
+				null,
+				null,
+				null
 			)
 			if (cursor.moveToFirst()) {
 				val name: TextView = findViewById(R.id.name)
