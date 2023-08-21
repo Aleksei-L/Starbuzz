@@ -1,8 +1,11 @@
 package com.example.starbuzz.activity
 
 import android.content.ContentValues
+import android.content.Context
 import android.database.sqlite.SQLiteException
+import android.os.AsyncTask
 import android.os.Bundle
+import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
@@ -52,27 +55,46 @@ class DrinkActivity : AppCompatActivity() {
 
 	private fun onFavoriteClicked() {
 		val drinkId = intent.getIntExtra(EXTRA_DRINKID, 0)
-		val favorite: CheckBox = findViewById(R.id.favorite)
-
-		val drinkValues = ContentValues()
-		drinkValues.put("favorite", favorite.isChecked)
-
-		val starbuzzDatabaseHelper = StarbuzzDatabaseHelper(this)
-		try {
-			val db = starbuzzDatabaseHelper.readableDatabase
-			db.update(
-				"drink",
-				drinkValues,
-				"_id = ?",
-				arrayOf(drinkId.toString())
-			)
-			db.close()
-		} catch (e: SQLiteException) {
-			Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT).show()
-		}
+		UpdateDrinkTask(this, findViewById(R.id.ll)).execute(drinkId)
 	}
 
 	companion object {
 		const val EXTRA_DRINKID = "drinkId"
+	}
+
+	private class UpdateDrinkTask(val context: Context, val view: View) :
+		AsyncTask<Int, Void, Boolean>() {
+		private lateinit var drinkValues: ContentValues
+
+		override fun onPreExecute() {
+			super.onPreExecute()
+			val favorite: CheckBox = view.findViewById(R.id.favorite)
+			drinkValues = ContentValues()
+			drinkValues.put("favorite", favorite.isChecked)
+		}
+
+		override fun doInBackground(vararg p0: Int?): Boolean {
+			val drinkId = p0[0]
+			val starbuzzDatabaseHelper = StarbuzzDatabaseHelper(context)
+			return try {
+				val db = starbuzzDatabaseHelper.writableDatabase
+				db.update(
+					"drink",
+					drinkValues,
+					"_id = ?",
+					arrayOf(drinkId.toString())
+				)
+				db.close()
+				true
+			} catch (e: SQLiteException) {
+				false
+			}
+		}
+
+		override fun onPostExecute(result: Boolean) {
+			super.onPostExecute(result)
+			if (!result)
+				Toast.makeText(context, "Database unavailable", Toast.LENGTH_SHORT).show()
+		}
 	}
 }
